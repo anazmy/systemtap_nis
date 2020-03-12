@@ -1,0 +1,43 @@
+#!/bin/stap
+
+probe
+process("/lib64/libnss_nis-2.12.so").statement("_nss_nis_getpwnam_r@nss_nis/nis-pwd.c:478")
+{ printf("Epoch: %lu, exe=%s, pid=%d, tid=%d, func=_nss_nis_getpwnam_r,
+runningUID=%d, runningGID=%d, queriedUser=%s, respUID=%lu \n", gettimeofday_s(),
+execname(), pid(), tid(), uid(), gid(), user_string($pwd->pw_name),
+$pwd->pw_uid) }
+
+
+probe
+process("/lib64/libnss_nis-2.12.so").statement("_nss_nis_getpwuid_r@nss_nis/nis-pwd.c:583")
+{ printf("Epoch: %lu, exe=%s, pid=%d, tid=%d, func=_nss_nis_getpwuid_r,
+runningUID=%d, runningGID=%d, queriedUser=%s, respUID=%lu \n", gettimeofday_s(),
+execname(), pid(), tid(), uid(), gid(), user_string($pwd->pw_name),
+$pwd->pw_uid) }
+
+
+probe
+process("/lib64/libnss_nis-2.12.so").statement("_nss_nis_getgrnam_r@nss_nis/nis-grp.c:305")
+{ printf("Epoch: %lu, exe=%s, pid=%d, tid=%d, func=_nss_nis_getgrnam_r,
+runningUID=%d, runningGID=%d, queriedUser=%s \n", gettimeofday_s(), execname(),
+pid(), tid(), uid(), gid(), user_string($name)) }
+
+probe
+process("/lib64/libnss_nis-2.12.so").statement("_nss_nis_getgrnam_r@nss_nis/nis-grp.c:311")
+{ printf("Epoch: %lu, exe=%s, pid=%d, tid=%d, func=_nss_nis_getgrnam_r,
+runningUID=%d, runningGID=%d, respGID=%lu \n", gettimeofday_s(), execname(),
+pid(), tid(), uid(), gid(), $grp->gr_gid) }
+
+
+probe
+process("/lib64/libnss_nis-2.12.so").statement("_nss_nis_getgrgid_r@nss_nis/nis-grp.c:360")
+{ printf("Epoch: %lu, exe=%s, pid=%d, tid=%d, func=_nss_nis_getgrgid_r,
+runningUID=%d, runningGID=%d, respGID=%lu \n", gettimeofday_s(), execname(),
+pid(), tid(), uid(), gid(), $grp->gr_gid) }
+
+
+probe
+process("/lib64/libnss_nis-2.12.so").statement("_nss_nis_initgroups_dyn@nss_nis/nis-initgroups.c:324")
+{ printf("Epoch: %lu, exe=%s, pid=%d, tid=%d, func=_nss_nis_initgroups_dyn,
+runningUID=%d, runningGID=%d, queriedUser=%s, respGID=%lu \n", gettimeofday_s(),
+execname(), pid(), tid(), uid(), gid(), user_string($user), $grpbuf->gr_gid) }
